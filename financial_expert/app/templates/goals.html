@@ -1,0 +1,150 @@
+{# templates/goals.html #}
+{% extends "base.html" %}
+{% block title %}Obiective Financiare{% endblock %}
+{% block content %}
+
+<div class="container my-4">
+    <div class="row g-4">
+        <!-- Form for new goal remains the same -->
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Adaugă Obiectiv Nou</h2>
+                    <form method="POST" action="{{ url_for('main.goals') }}">
+                        {{ form.csrf_token }}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.category.label(class="form-label") }}
+                                {{ form.category(class="form-select") }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.target_amount.label(class="form-label") }}
+                                {{ form.target_amount(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.target_date.label(class="form-label") }}
+                                {{ form.target_date(class="form-control") }}
+                            </div>
+                            <div class="col-12 text-end">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- List of existing goals -->
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Obiectivele Mele</h2>
+                    <div class="row mt-4">
+                        {% for goal in goals %}
+                        <div class="col-md-6 mb-4">
+                            <div class="goal-card">
+                                <div class="goal-header d-flex justify-content-between align-items-center mb-3">
+                                    <h3>{{ goal.name }}</h3>
+                                    <span class="badge bg-{{ goal.status|lower }}">{{ goal.status }}</span>
+                                </div>
+
+                                <div class="goal-amounts mb-3">
+                                    <div class="row">
+                                        <div class="col-12 mb-2">
+                                            <small class="text-muted">Suma acumulată până acum</small>
+                                            <div class="h4 mb-0 text-success">{{ "{:,.2f}".format(goal.current_amount) }} MDL</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <small class="text-muted">Suma țintă</small>
+                                            <div class="h5 mb-0">{{ "{:,.2f}".format(goal.target_amount) }} MDL</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         style="width: {{ progress[goal.id].progress_percentage }}%" 
+                                         aria-valuenow="{{ progress[goal.id].progress_percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ "%.1f"|format(progress[goal.id].progress_percentage) }}%
+                                    </div>
+                                </div>
+
+                                <div class="goal-details">
+                                    <div class="row g-3 mb-3">
+                                        <!-- Add contribution form -->
+                                        <div class="col-md-6">
+                                            <form action="{{ url_for('main.add_contribution', goal_id=goal.id) }}" 
+                                                  method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-success text-white">+</span>
+                                                    <input type="number" 
+                                                           name="contribution" 
+                                                           placeholder="Adaugă"
+                                                           step="0.01" 
+                                                           class="form-control" 
+                                                           required>
+                                                    <button type="submit" class="btn btn-success">
+                                                        Adaugă
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <!-- Subtract amount form -->
+                                        <div class="col-md-6">
+                                            <form action="{{ url_for('main.subtract_amount', goal_id=goal.id) }}" 
+                                                  method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-warning text-white">-</span>
+                                                    <input type="number" 
+                                                           name="subtract_amount" 
+                                                           placeholder="Scade"
+                                                           step="0.01" 
+                                                           class="form-control" 
+                                                           required>
+                                                    <button type="submit" class="btn btn-warning">
+                                                        Scade
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div class="target-date mb-3">
+                                        <small class="text-muted">Termen</small>
+                                        <div>{{ goal.target_date.strftime('%d/%m/%Y') }}</div>
+                                        <div class="text-muted">
+                                            ({{ progress[goal.id].days_remaining }} zile rămase)
+                                        </div>
+                                    </div>
+
+                                    <!-- Delete goal form -->
+                                    <form action="{{ url_for('main.delete_goal', goal_id=goal.id) }}" 
+                                          method="POST"
+                                          onsubmit="return confirm('Sigur doriți să ștergeți acest obiectiv?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                                            Șterge Obiectivul
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

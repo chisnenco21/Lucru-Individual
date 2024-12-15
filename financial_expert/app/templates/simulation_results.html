@@ -1,0 +1,229 @@
+{# templates/simulation_results.html #}
+{% extends "base.html" %}
+{% block title %}Rezultate Simulare{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Rezultatele Simulării</h2>
+                    
+                    <div class="summary-box mb-4 p-3 bg-light rounded">
+                        <h3 class="h5 mb-3">Parametrii Simulării</h3>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <small class="text-muted">Suma inițială</small>
+                                <div class="h5">{{ "{:,.2f}".format(params.initial_amount) }} MDL</div>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">Contribuție lunară</small>
+                                <div class="h5">{{ "{:,.2f}".format(params.monthly_contribution) }} MDL</div>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">Perioada</small>
+                                <div class="h5">{{ params.time_horizon }} ani</div>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">Profil de risc</small>
+                                <div class="h5">{{ params.risk_profile }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <canvas id="portfolioGrowthChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Anul</th>
+                                    <th class="text-end">Valoare Portofoliu</th>
+                                    <th class="text-end">Total Contribuții</th>
+                                    <th class="text-end">Câștiguri</th>
+                                    <th class="text-end">Randament</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.year }}</td>
+                                    <td class="text-end">{{ "{:,.2f}".format(result.value) }} MDL</td>
+                                    <td class="text-end">{{ "{:,.2f}".format(result.contributions) }} MDL</td>
+                                    <td class="text-end {% if result.earnings > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ "{:,.2f}".format(result.earnings) }} MDL
+                                    </td>
+                                    <td class="text-end {% if result.earnings > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ "{:.1f}".format((result.earnings / result.contributions) * 100) }}%
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h3 class="h5">Sumar Final</h3>
+                                    {% set final_result = results[-1] %}
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <small class="text-muted">Valoare finală:</small>
+                                            <div class="h4">{{ "{:,.2f}".format(final_result.value) }} MDL</div>
+                                        </li>
+                                        <li class="mb-2">
+                                            <small class="text-muted">Total contribuții:</small>
+                                            <div class="h5">{{ "{:,.2f}".format(final_result.contributions) }} MDL</div>
+                                        </li>
+                                        <li class="mb-2">
+                                            <small class="text-muted">Total câștiguri:</small>
+                                            <div class="h5 {% if final_result.earnings > 0 %}text-success{% else %}text-danger{% endif %}">
+                                                {{ "{:,.2f}".format(final_result.earnings) }} MDL
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <small class="text-muted">Randament total:</small>
+                                            <div class="h5 {% if final_result.earnings > 0 %}text-success{% else %}text-danger{% endif %}">
+                                                {{ "{:.1f}".format((final_result.earnings / final_result.contributions) * 100) }}%
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h3 class="h5">Note Importante</h3>
+                                    <ul class="text-muted small">
+                                        <li>Simularea presupune rate de randament constante bazate pe profilul de risc ales</li>
+                                        <li>Rezultatele sunt estimate și nu garantează performanța viitoare</li>
+                                        <li>Nu sunt luate în calcul taxele și inflația</li>
+                                        <li>Se recomandă rebalansarea periodică a portofoliului</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('main.simulate') }}" class="btn btn-primary">
+                            Simulare Nouă
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('portfolioGrowthChart').getContext('2d');
+        
+        // Pregătim datele pentru grafic
+        const years = {{ results|map(attribute='year')|list|tojson }};
+        const portfolioValues = {{ results|map(attribute='value')|list|tojson }};
+        const contributions = {{ results|map(attribute='contributions')|list|tojson }};
+        const earnings = {{ results|map(attribute='earnings')|list|tojson }};
+    
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years.map(year => `Anul ${year}`),
+                datasets: [
+                    {
+                        label: 'Valoare Totală',
+                        data: portfolioValues,
+                        borderColor: 'rgb(37, 99, 235)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Contribuții',
+                        data: contributions,
+                        borderColor: 'rgb(5, 150, 105)',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2, // Face graficul mai compact
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Evoluția Portofoliului în Timp',
+                        font: {
+                            size: 14 // Font mai mic pentru titlu
+                        },
+                        padding: 10
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 11 // Font mai mic pentru legendă
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.raw;
+                                return `${context.dataset.label}: ${value.toLocaleString('ro-RO', {
+                                    style: 'currency',
+                                    currency: 'MDL'
+                                })}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 10 // Font mai mic pentru axe
+                            },
+                            callback: function(value) {
+                                return value.toLocaleString('ro-RO', {
+                                    style: 'currency',
+                                    currency: 'MDL',
+                                    maximumFractionDigits: 0
+                                });
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 10 
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+    </script>
+{% endblock %}

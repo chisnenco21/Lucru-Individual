@@ -1,0 +1,81 @@
+{# templates/portfolio.html #}
+{% extends "base.html" %}
+{% block title %}Portofoliul Meu{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Sumar Portofoliu</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="stats-box">
+                                <h3>Valoare Totală</h3>
+                                <div class="value">
+                                    {{ "{:,.2f}".format(portfolio.total_value|default(0)) }} MDL
+                                </div>
+                                <div class="change {% if returns.total|default(0) >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ returns.total|default(0) }}% total
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-box">
+                                <h3>Randament Anual</h3>
+                                <div class="value">
+                                    {{ returns.annualized|default(0) }}%
+                                </div>
+                                <div class="text-muted">Ultimele 12 luni</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-box">
+                                <h3>Următoarea Rebalansare</h3>
+                                <div class="value">15 zile</div>
+                                <div class="text-muted">Portofoliu în parametri</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Tranzacții Recente</h2>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tip</th>
+                                    <th>Sumă</th>
+                                    <th>Descriere</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if portfolio.transactions %}
+                                    {% for transaction in portfolio.transactions %}
+                                    <tr>
+                                        <td>{{ transaction.date.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ transaction.transaction_type }}</td>
+                                        <td>{{ "{:,.2f}".format(transaction.amount) }} MDL</td>
+                                        <td>{{ transaction.description }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">Nu există tranzacții înregistrate</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

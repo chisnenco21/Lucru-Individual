@@ -1,0 +1,70 @@
+{# templates/simulation.html #}
+{% extends "base.html" %}
+{% block title %}Simulare Investiții{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+        <!-- Formular Simulare -->
+        <div class="col-md-6">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Parametri Simulare</h2>
+                    <form method="POST" class="mt-4">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            {{ form.initial_amount.label(class="form-label") }}
+                            {{ form.initial_amount(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.monthly_contribution.label(class="form-label") }}
+                            {{ form.monthly_contribution(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.time_horizon.label(class="form-label") }}
+                            {{ form.time_horizon(class="form-select") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.risk_profile.label(class="form-label") }}
+                            {{ form.risk_profile(class="form-select") }}
+                        </div>
+                        <div class="text-end">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <h2 class="card-title">Despre Simulare</h2>
+                    <div class="mt-4">
+                        <h4>Cum funcționează?</h4>
+                        <p>Simulatorul calculează posibila evoluție a investițiilor tale bazată pe:</p>
+                        <ul>
+                            <li>Suma inițială investită</li>
+                            <li>Contribuțiile lunare regulate</li>
+                            <li>Perioada de investiție</li>
+                            <li>Profilul de risc ales</li>
+                        </ul>
+                        
+                        <h4 class="mt-4">Randamente estimate pe profil de risc:</h4>
+                        <ul>
+                            <li><strong>Conservator:</strong> 5-7% anual</li>
+                            <li><strong>Moderat:</strong> 7-9% anual</li>
+                            <li><strong>Agresiv:</strong> 9-12% anual</li>
+                        </ul>
+                        
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle"></i>
+                            Rezultatele sunt estimative și nu garantează performanța viitoare.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

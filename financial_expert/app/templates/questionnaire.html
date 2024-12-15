@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Expert Financiar - Chestionar{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="card-title mb-4">Chestionar Profil Financiar</h2>
+        <form method="POST" action="">
+            {{ form.csrf_token }}
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.age.label }}
+                        {{ form.age }}
+                        {% if form.age.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.age.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.income.label }}
+                        {{ form.income }}
+                        {% if form.income.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.income.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.savings.label }}
+                        {{ form.savings }}
+                        {% if form.savings.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.savings.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.dependents.label }}
+                        {{ form.dependents }}
+                        {% if form.dependents.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.dependents.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.risk_tolerance.label }}
+                        {{ form.risk_tolerance }}
+                        {% if form.risk_tolerance.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.risk_tolerance.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.investment_goals.label }}
+                        {{ form.investment_goals }}
+                        {% if form.investment_goals.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.investment_goals.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form.time_horizon.label }}
+                        {{ form.time_horizon }}
+                        {% if form.time_horizon.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.time_horizon.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                {{ form.submit }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
