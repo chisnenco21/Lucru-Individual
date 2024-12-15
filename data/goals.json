@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "name": "Masina",
+    "target_amount": 40000.0,
+    "current_amount": 3455.0,
+    "target_date": "2024-11-30",
+    "category": "OTHER",
+    "status": "IN_PROGRESS"
+  }
+]
