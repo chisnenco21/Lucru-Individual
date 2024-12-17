@@ -1,0 +1,39 @@
+{# templates/system_status.html #}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Starea Sistemului</h1>
+    <div id="status-container">
+        <p><strong>Încărcare CPU:</strong> <span id="cpu-value">--</span>%</p>
+        <p><strong>Memorie RAM disponibilă:</strong> <span id="ram-value">--</span> %</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateStatus() {
+    fetch("{{ url_for('main.api_system_status') }}")
+        .then(response => response.json())
+        .then(data => {
+            if (data.cpu !== undefined && data.ram !== undefined) {
+                document.getElementById('cpu-value').textContent = data.cpu;
+                document.getElementById('ram-value').textContent = data.ram;
+            } else {
+                document.getElementById('cpu-value').textContent = '--';
+                document.getElementById('ram-value').textContent = '--';
+            }
+        })
+        .catch(error => {
+            console.log("Eroare la preluarea datelor:", error);
+            document.getElementById('cpu-value').textContent = '--';
+            document.getElementById('ram-value').textContent = '--';
+        });
+}
+
+setInterval(updateStatus, 2000);
+
+document.addEventListener('DOMContentLoaded', updateStatus);
+</script>
+{% endblock %}

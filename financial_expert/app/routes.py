@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import json
 import os
 from datetime import datetime
+import requests
 from pathlib import Path
 bp = Blueprint('main', __name__)
 
@@ -377,3 +378,26 @@ def chart_data():
         }
         for rec in session['recommendations']
     ])
+    
+@bp.route('/system_status', methods=['GET'])
+def system_status():
+    return render_template('system_status.html')
+
+@bp.route('/api/system_status', methods=['GET'])
+def api_system_status():
+    try:
+        # Schimbați adresa conform cu API-ul disponibil
+        response = requests.get('http://host.docker.internal:5001/status')
+        data = response.json()
+        cpu_percent = data.get('cpu_percent')
+        free_ram_mb = data.get('mem_percent')
+        
+        # Returnăm datele în format JSON
+        return jsonify({
+            'cpu': cpu_percent,
+            'ram': free_ram_mb
+        }), 200
+    except Exception as e:
+        print(f"Eroare la preluarea datelor de la API: {str(e)}")
+        return jsonify({'error': 'Nu s-au putut prelua datele despre sistem'}), 500
+
